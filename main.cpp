@@ -40,7 +40,8 @@ int main()
     G.add_edge(1,4);
     G.add_edge(4,2);
 
-    // G.remove_node(1);
+    G.remove_node(3);
+    G.remove_node(4);
 
     for (auto &&elt : G.degrees)
     {
@@ -49,15 +50,16 @@ int main()
     }
     
 
-    // Linkedlist<node_t>& L= G.degrees[1];
-    // LNode<node_t>* elt = L.get_head();
-    // int i=0;
+    Linkedlist<node_t>& L= G.degrees[1];
+    LNode<node_t>* elt = L.get_head();
+    cout<<elt->node->id<<endl;
+    cout<<elt->next->node->id<<endl;
+    cout<<elt->next->next->node->id<<endl;
     // do
     // {
     //     cout<<elt->node->id<<endl;
     //     elt = elt->next;
-    //     i++;
-    // } while(elt!=nullptr && i<5);
+    // } while(elt!=nullptr);
     
 
 

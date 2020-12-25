@@ -33,8 +33,11 @@ struct Graph
 {
     /* data */
     public:
+                      //node_id 
         unordered_map<int, node_t*> nodes; 
         unordered_map<int, Linkedlist<node_t> > degrees;
+                      //degree          //node_id        
+        // unordered_map<int, unordered_map<int, bool> > degrees;
         int n_edges=0;
         int lowest_degree=0;
 
@@ -62,14 +65,11 @@ struct Graph
         if(nodes.find(src)==nodes.end()){
             nodes[src] = new node_t(src);
             degrees[0].push_back(nodes[src]);
-            cout<<"src: "<<src << " s: "<< degrees[0].size<<endl;
-
         }
 
         if(nodes.find(dst)==nodes.end()){
             nodes[dst] = new node_t(dst);
             degrees[0].push_back(nodes[dst]);
-            cout<<"dst: "<<dst << " s: "<< degrees[0].size<<endl;
         }
 
         // if edge already exist
@@ -93,7 +93,7 @@ struct Graph
 
     void change_node_degree(node_t* node, int new_degree){
 
-        degrees[new_degree].detach_and_push(node->degree_node); 
+        degrees[new_degree].detach_and_push(node); 
         
         if(degrees[node->degree].size==1){
             degrees.erase(node->degree);
@@ -105,28 +105,25 @@ struct Graph
     }
 
     void remove_node(int id){
-        // node_t* node = nodes[id];
+        node_t* node = nodes[id];
 
-        // // remove the node from its neighboors neighborhood
-        // for(auto& elt: node->neighboors){
-        //     elt.second->neighboors.erase(id);
-        //     change_node_degree(elt.first, elt.second->degree-1);
-        //     n_edges--;
-        // }
+        // remove the node from its neighboors neighborhood
+        for(auto& elt: node->neighboors){
+            elt.second->neighboors.erase(id);
+            change_node_degree(elt.second, elt.second->degree-1);
+            n_edges--;
+        }
 
-        // // remove from degree tracker
-        // degrees[node->degree]->detach(node->degree_node);
-        // if(degrees[node->degree]->size==1){
-        //     degrees.erase(node->degree);
-        // }else{
-        //     degrees[node->degree]->size--;
-        // }
+        // remove from degree tracker
+        degrees[node->degree].detach(node);
+        if(degrees[node->degree].size==1){
+            degrees.erase(node->degree);
+        }else{
+            degrees[node->degree].size--;
+        }
 
-        // // // remove from nodes
-        // nodes.erase(id);
-
-        
- 
+        // remove from nodes
+        nodes.erase(id);
     }
 
     // std::ostream& operator<<(std::ostream& out, const graph_t& G){

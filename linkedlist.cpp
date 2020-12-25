@@ -38,10 +38,11 @@ struct Linkedlist
 
         head = new_node;
         size++;
-        std::cout<<"size: "<<size<<std::endl;
     }
 
-    void detach_and_push(LNode<T>* new_node){
+    void detach_and_push(T* node){
+        LNode<T>* new_node = node->degree_node;
+
         // remove from previous linkedlist 
         if(new_node->prev!=nullptr)
             new_node->prev->next = new_node->next;
@@ -62,15 +63,19 @@ struct Linkedlist
         size++;
     }
 
-    static void detach(LNode<T>* node){
-        // remove from previous linkedlist 
-        if(node->prev!=nullptr)
-            node->prev->next = node->next;
-        if(node->next!=nullptr)
-            node->next->prev =  node->prev;
+    static void detach(T* node){
+        LNode<T>* degree_node = node->degree_node;
 
-        node->next=nullptr; node->prev=nullptr; 
+        // remove from previous linkedlist 
+        if(degree_node->prev!=nullptr)
+            degree_node->prev->next = degree_node->next;
+        if(degree_node->next!=nullptr)
+            degree_node->next->prev =  degree_node->prev;
+
+        degree_node->next=nullptr; degree_node->prev=nullptr; 
     }
+
+    get_size
 
     LNode<T>* get_head(){
         return head;
