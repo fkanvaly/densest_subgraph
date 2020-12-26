@@ -1,22 +1,21 @@
 #pragma once
 
-template <typename T>
+
 struct LNode
 {
     /* data */
-    T* node;
-    LNode<T>* prev;
-    LNode<T>* next;
+    int id;
+    LNode* prev;
+    LNode* next;
     
-    LNode():node(nullptr), next(nullptr), prev(nullptr){}
-    LNode(T* node_):node(node_), next(nullptr), prev(nullptr){} 
+    LNode():node(-1), next(nullptr), prev(nullptr){}
+    LNode(int id_:id(id_), next(nullptr), prev(nullptr){} 
 };
 
-template <typename T>
 struct Linkedlist
 {
     /* data */
-    LNode<T>* head = nullptr;
+    LNode* head = nullptr;
     int size;
 
     Linkedlist(){
@@ -74,8 +73,6 @@ struct Linkedlist
 
         degree_node->next=nullptr; degree_node->prev=nullptr; 
     }
-
-    get_size
 
     LNode<T>* get_head(){
         return head;
