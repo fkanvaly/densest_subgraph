@@ -1,80 +1,236 @@
-#pragma once
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unordered_map> 
 
+using namespace std;
 
-struct LNode
-{
-    /* data */
-    int id;
-    LNode* prev;
-    LNode* next;
+template <typename T1, typename T2>
+struct paire { 
+    T1 id; 
+    T2 node_ref;
+    paire(){}
+    paire(T1 id_, T2 node_): id(id_), node_ref(node_){}
+};
+
+// A linked list node 
+template <typename T>
+struct Node { 
+    T data; 
+    Node<T>* next; 
+    Node<T>* prev; 
+};
+
+typedef paire<int, Node<int>* > int_node;
+
+template <typename T>
+struct Linkedlist{
+    /* Given a reference (pointer to pointer) to the head of a list 
+    and an int, inserts a new node on the front of the list. */
+    static Node<T>* push(Node<T>** head_ref, T new_data) 
+    { 
+        Node<T>* new_node = (Node<T>*)malloc(sizeof(Node<T>)); 
     
-    LNode():node(-1), next(nullptr), prev(nullptr){}
-    LNode(int id_:id(id_), next(nullptr), prev(nullptr){} 
-};
+        new_node->data = new_data; 
+    
+        new_node->next = (*head_ref); 
+        new_node->prev = NULL; 
+    
+        if ((*head_ref) != NULL) 
+            (*head_ref)->prev = new_node; 
+    
+        (*head_ref) = new_node; 
+        return new_node;
+    } 
 
-struct Linkedlist
+    static void push(Node<T>** head_ref, Node<T>* new_node) 
+    {
+        new_node->next = (*head_ref); 
+        new_node->prev = NULL; 
+    
+        if ((*head_ref) != NULL) 
+            (*head_ref)->prev = new_node; 
+    
+        (*head_ref) = new_node; 
+    } 
+    
+    /* Given a node as next_node, insert a new node before the given node */
+    static Node<T>* insertBefore(Node<T>** head_ref, Node<T>* next_node, T new_data) 
+    { 
+        /*1. check if the given next_node is NULL */
+        if (next_node == NULL) { 
+            printf("the given next node cannot be NULL"); 
+            return NULL; 
+        } 
+
+        /* 2. allocate new node */
+        Node<T>* new_node = (Node<T>*)malloc(sizeof(struct Node<T>)); 
+    
+        /* 3. put in the data */
+        new_node->data = new_data; 
+    
+        /* 4. Make prev of new node as prev of next_node */
+        new_node->prev = next_node->prev; 
+    
+        /* 5. Make the prev of next_node as new_node */
+        next_node->prev = new_node; 
+    
+        /* 6. Make next_node as next of new_node */
+        new_node->next = next_node; 
+    
+        /* 7. Change next of new_node's previous node */
+        if (new_node->prev != NULL) 
+            new_node->prev->next = new_node; 
+        /* 8. If the prev of new_node is NULL, it will be
+        the new head node */
+        else
+            (*head_ref) = new_node;
+        
+        return new_node;
+    } 
+ 
+    // This function prints contents of linked list starting from the given node 
+    static void printList(Node<T>* node) 
+    { 
+        struct Node<T>* last; 
+        printf("\nTraversal in forward direction \n"); 
+        while (node != NULL) { 
+            printf(" %d ", node->data); 
+            last = node; 
+            node = node->next; 
+        } 
+    } 
+
+    /* Function to delete a node in a Doubly Linked List. 
+    head_ref --> pointer to head node pointer. 
+    del --> pointer to node to be deleted. */
+    static void deleteNode(Node<T>** head_ref, Node<T>* del) 
+    { 
+        /* base case */
+        if (*head_ref == NULL || del == NULL) 
+            return; 
+    
+        /* If node to be deleted is head node */
+        if (*head_ref == del) 
+            *head_ref = del->next; 
+    
+        /* Change next only if node to be 
+        deleted is NOT the last node */
+        if (del->next != NULL) 
+            del->next->prev = del->prev; 
+    
+        /* Change prev only if node to be 
+        deleted is NOT the first node */
+        if (del->prev != NULL) 
+            del->prev->next = del->next; 
+    
+        /* Finally, free the memory occupied by del*/
+        free(del); 
+        return; 
+    } 
+
+    /* Function to delete a node in a Doubly Linked List. 
+    head_ref --> pointer to head node pointer. 
+    del --> pointer to node to be deleted. */
+    static void detachNode(Node<T>** head_ref, Node<T>* del) 
+    { 
+        /* base case */
+        if (*head_ref == NULL || del == NULL) 
+            return; 
+    
+        /* If node to be deleted is head node */
+        if (*head_ref == del) 
+            *head_ref = del->next; 
+    
+        /* Change next only if node to be 
+        deleted is NOT the last node */
+        if (del->next != NULL) 
+            del->next->prev = del->prev; 
+    
+        /* Change prev only if node to be 
+        deleted is NOT the first node */
+        if (del->prev != NULL) 
+            del->prev->next = del->next; 
+    
+        /* Finally, free the memory occupied by del*/
+        del->next = NULL; 
+        del->prev = NULL; 
+        return; 
+    } 
+}; 
+
+struct Degree_tracker
 {
-    /* data */
-    LNode* head = nullptr;
-    int size;
-
-    Linkedlist(){
-        size = 0;
-        head=nullptr;
+    
+    Node<int_node>** degree_head; // pointer to head node pointer. 
+    unordered_map<int, Node<int_node>* > track;
+    Degree_tracker(){
+        Node<int>* init_head = NULL; 
+        Node<int_node>* deg_init_head = NULL;
+        track[0] = Linkedlist<int_node>::push(&deg_init_head, int_node(0, init_head));
+        degree_head = &deg_init_head;
     }
 
-    void push_back(T* node){
-        LNode<T>* new_node = new LNode<T>(node);
-        node->degree_node = new_node;
+    Node<int>* new_node (int node_id){
+        return Linkedlist<int>::push(&(track[0]->data.node_ref), node_id);
+    }
 
-        // if empty
-        if(head==nullptr){
-            head = new_node;
+    void increase(Node<int>* node, int d){
+        Linkedlist<int>::detachNode(&(track[d]->data.node_ref), node);
+        
+        if (track.find(d+1)!=track.end()){
+            Linkedlist<int>::push(&(track[d+1]->data.node_ref), node);
+        }else{
+            Node<int>* head = NULL;
+            if (track[d] == *degree_head){ 
+                track[d+1] = Linkedlist<int_node>::push(degree_head, int_node(d+1, head));
+            }else{
+                track[d+1] = Linkedlist<int_node>::insertBefore(degree_head, track[d], int_node(d+1, head));
+            }
         }
 
-        new_node->next = head;
-        head->prev = new_node;
-
-        head = new_node;
-        size++;
-    }
-
-    void detach_and_push(T* node){
-        LNode<T>* new_node = node->degree_node;
-
-        // remove from previous linkedlist 
-        if(new_node->prev!=nullptr)
-            new_node->prev->next = new_node->next;
-        if(new_node->next!=nullptr)
-            new_node->next->prev =  new_node->prev;
-
-        new_node->next=nullptr; new_node->prev=nullptr; 
-
-        // add the now to the current linkedlist
-        if(head==nullptr){
-            head = new_node;
+        if(track[d]->data.node_ref == NULL){
+            Linkedlist<int_node>::deleteNode(degree_head, track[d]);
+            track.erase(d);
         }
-
-        new_node->next = head;
-        head->prev = new_node;
-
-        head = new_node;
-        size++;
-    }
-
-    static void detach(T* node){
-        LNode<T>* degree_node = node->degree_node;
-
-        // remove from previous linkedlist 
-        if(degree_node->prev!=nullptr)
-            degree_node->prev->next = degree_node->next;
-        if(degree_node->next!=nullptr)
-            degree_node->next->prev =  degree_node->prev;
-
-        degree_node->next=nullptr; degree_node->prev=nullptr; 
-    }
-
-    LNode<T>* get_head(){
-        return head;
+         
     }
 };
+
+
+
+/* Driver program to test above functions*/
+int main() 
+{ 
+    Node<int_node>* map = NULL;
+
+    // degree 1
+    Node<int>* head1 = NULL; 
+    Node<int_node>* nn = Linkedlist<int_node>::push(&map, int_node(1, head1)); 
+
+    Node<int>* n11 = Linkedlist<int>::push(&(map->data.node_ref), 2); 
+    Node<int>* n12 = Linkedlist<int>::push(&(map->data.node_ref), 4); 
+    Node<int>* n13 = Linkedlist<int>::push(&(map->data.node_ref), 8);
+    Node<int>* n14 = Linkedlist<int>::push(&(map->data.node_ref), 10); 
+
+
+    // degree 2
+    Node<int>* head2 = NULL; 
+    Node<int_node>* nn2 = Linkedlist<int_node>::push(&map, int_node(2, head2)); 
+
+    Node<int>* n21 = Linkedlist<int>::push(&(map->data.node_ref), 12); 
+    Node<int>* n22 = Linkedlist<int>::push(&(map->data.node_ref), 14); 
+    Node<int>* n23 = Linkedlist<int>::push(&(map->data.node_ref), 18);
+    Node<int>* n24 = Linkedlist<int>::push(&(map->data.node_ref), 110);
+
+    Linkedlist<int>::printList(nn->data.node_ref); 
+    Linkedlist<int>::printList(nn2->data.node_ref); 
+
+    Linkedlist<int>::detachNode(&(nn->data.node_ref), n11);
+    Linkedlist<int>::push(&(nn2->data.node_ref), n11);
+
+    Linkedlist<int>::printList(nn->data.node_ref); 
+    Linkedlist<int>::printList(nn2->data.node_ref); 
+
+    getchar(); 
+    return 0; 
+}

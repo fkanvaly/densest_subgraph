@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map> 
 #include "linkedlist.cpp"
+
 using namespace std;
 
 struct node_t
@@ -12,7 +13,7 @@ struct node_t
     unordered_map<int, node_t* > neighboors;
 
     int degree=0;
-    LNode<node_t>* degree_node;
+    struct Node* degree_node;
     
     node_t():id(-1){}
 
@@ -35,21 +36,11 @@ struct Graph
     public:
                       //node_id 
         unordered_map<int, node_t*> nodes; 
-        unordered_map<int, Linkedlist<node_t> > degrees;
-                      //degree          //node_id        
-        // unordered_map<int, unordered_map<int, bool> > degrees;
+        struct Node< Node<int> > degrees;
         int n_edges=0;
         int lowest_degree=0;
 
     Graph(){
-    }
-
-    vector<int> get_nodes(){
-        vector<int> nodes_vec;
-        for (auto elt: nodes) 
-            nodes_vec.push_back(elt.first);
-
-        return nodes_vec;
     }
 
     int nb_nodes(){
