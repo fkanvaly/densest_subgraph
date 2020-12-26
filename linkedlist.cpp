@@ -1,6 +1,7 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unordered_map> 
+#include <iostream>
 
 using namespace std;
 
@@ -42,7 +43,7 @@ struct Linkedlist{
         return new_node;
     } 
 
-    static void push(Node<T>** head_ref, Node<T>* new_node) 
+    static void push_node(Node<T>** head_ref, Node<T>* new_node) 
     {
         new_node->next = (*head_ref); 
         new_node->prev = NULL; 
@@ -94,7 +95,7 @@ struct Linkedlist{
         struct Node<T>* last; 
         printf("\nTraversal in forward direction \n"); 
         while (node != NULL) { 
-            printf(" %d ", node->data); 
+            printf("%d ", node->data); 
             last = node; 
             node = node->next; 
         } 
@@ -160,7 +161,6 @@ struct Linkedlist{
 
 struct Degree_tracker
 {
-    
     Node<int_node>** degree_head; // pointer to head node pointer. 
     unordered_map<int, Node<int_node>* > track;
     Degree_tracker(){
@@ -178,13 +178,20 @@ struct Degree_tracker
         Linkedlist<int>::detachNode(&(track[d]->data.node_ref), node);
         
         if (track.find(d+1)!=track.end()){
-            Linkedlist<int>::push(&(track[d+1]->data.node_ref), node);
+            Linkedlist<int>::push_node(&(track[d+1]->data.node_ref), node);
         }else{
             Node<int>* head = NULL;
-            if (track[d] == *degree_head){ 
+            
+            if (track[d]->prev == NULL){ 
                 track[d+1] = Linkedlist<int_node>::push(degree_head, int_node(d+1, head));
+                Linkedlist<int>::push_node(&(track[d+1]->data.node_ref), node); 
+                printf("\nhead");
             }else{
-                track[d+1] = Linkedlist<int_node>::insertBefore(degree_head, track[d], int_node(d+1, head));
+                track[d+1] = Linkedlist<int_node>::insertBefore(degree_head, &(*track[d]), int_node(d+1, head));
+                printf("not head");
+                cout<<""<<endl;
+                printf("increase : %d", track[d+1]->data.id);
+
             }
         }
 
@@ -196,41 +203,24 @@ struct Degree_tracker
     }
 };
 
+void print_map(Node<int_node>* degree_head){
+
+}
 
 
 /* Driver program to test above functions*/
 int main() 
 { 
-    Node<int_node>* map = NULL;
+    Degree_tracker deg_tracker = Degree_tracker();
+    Node<int>* n1 = deg_tracker.new_node(1);
+    Node<int>* n2 = deg_tracker.new_node(2);
+    Node<int>* n3 = deg_tracker.new_node(4);
 
-    // degree 1
-    Node<int>* head1 = NULL; 
-    Node<int_node>* nn = Linkedlist<int_node>::push(&map, int_node(1, head1)); 
+    deg_tracker.increase(n2, 0);
+    deg_tracker.increase(n2, 1);
+    deg_tracker.increase(n1, 0);
 
-    Node<int>* n11 = Linkedlist<int>::push(&(map->data.node_ref), 2); 
-    Node<int>* n12 = Linkedlist<int>::push(&(map->data.node_ref), 4); 
-    Node<int>* n13 = Linkedlist<int>::push(&(map->data.node_ref), 8);
-    Node<int>* n14 = Linkedlist<int>::push(&(map->data.node_ref), 10); 
-
-
-    // degree 2
-    Node<int>* head2 = NULL; 
-    Node<int_node>* nn2 = Linkedlist<int_node>::push(&map, int_node(2, head2)); 
-
-    Node<int>* n21 = Linkedlist<int>::push(&(map->data.node_ref), 12); 
-    Node<int>* n22 = Linkedlist<int>::push(&(map->data.node_ref), 14); 
-    Node<int>* n23 = Linkedlist<int>::push(&(map->data.node_ref), 18);
-    Node<int>* n24 = Linkedlist<int>::push(&(map->data.node_ref), 110);
-
-    Linkedlist<int>::printList(nn->data.node_ref); 
-    Linkedlist<int>::printList(nn2->data.node_ref); 
-
-    Linkedlist<int>::detachNode(&(nn->data.node_ref), n11);
-    Linkedlist<int>::push(&(nn2->data.node_ref), n11);
-
-    Linkedlist<int>::printList(nn->data.node_ref); 
-    Linkedlist<int>::printList(nn2->data.node_ref); 
-
-    getchar(); 
-    return 0; 
+    Linkedlist<int>::printList(deg_tracker.track[0]->data.node_ref);
+    Linkedlist<int>::printList(deg_tracker.track[1]->data.node_ref);
+    Linkedlist<int>::printList(deg_tracker.track[2]->data.node_ref);
 }
