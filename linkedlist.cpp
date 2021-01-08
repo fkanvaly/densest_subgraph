@@ -21,13 +21,15 @@ struct Node {
     Node<T>* prev; 
 };
 
-typedef paire<int, Node<int>* > int_node;
+typedef paire<int, Node<int>** > int_node;
+unordered_map<int, Node<int_node>** > track;
+
 
 template <typename T>
 struct Linkedlist{
     /* Given a reference (pointer to pointer) to the head of a list 
     and an int, inserts a new node on the front of the list. */
-    static Node<T>* push(Node<T>** head_ref, T new_data) 
+    static void push_ll(Node<T>** head_ref, T new_data) 
     { 
         Node<T>* new_node = (Node<T>*)malloc(sizeof(Node<T>)); 
     
@@ -40,6 +42,24 @@ struct Linkedlist{
             (*head_ref)->prev = new_node; 
     
         (*head_ref) = new_node; 
+
+        track[new_data.id]= &new_node;
+    } 
+
+    static Node<int>* push_node(Node<T>** head_ref, T new_data) 
+    {
+        Node<T>* new_node = (Node<T>*)malloc(sizeof(Node<T>)); 
+    
+        new_node->data = new_data; 
+    
+        new_node->next = (*head_ref); 
+        new_node->prev = NULL; 
+    
+        if ((*head_ref) != NULL) 
+            (*head_ref)->prev = new_node; 
+    
+        (*head_ref) = new_node; 
+
         return new_node;
     } 
 
@@ -55,12 +75,12 @@ struct Linkedlist{
     } 
     
     /* Given a node as next_node, insert a new node before the given node */
-    static Node<T>* insertBefore(Node<T>** head_ref, Node<T>* next_node, T new_data) 
+    static void insertBefore(Node<T>** head_ref, Node<T>* next_node, T new_data) 
     { 
         /*1. check if the given next_node is NULL */
         if (next_node == NULL) { 
             printf("the given next node cannot be NULL"); 
-            return NULL; 
+            return; 
         } 
 
         /* 2. allocate new node */
@@ -86,7 +106,7 @@ struct Linkedlist{
         else
             (*head_ref) = new_node;
         
-        return new_node;
+        track[new_data.id]= &new_node;
     } 
  
     // This function prints contents of linked list starting from the given node 
@@ -162,45 +182,44 @@ struct Linkedlist{
 struct Degree_tracker
 {
     Node<int_node>** degree_head; // pointer to head node pointer. 
-    unordered_map<int, Node<int_node>* > track;
     Degree_tracker(){
         Node<int>* init_head = NULL; 
         Node<int_node>* deg_init_head = NULL;
-        track[0] = Linkedlist<int_node>::push(&deg_init_head, int_node(0, init_head));
+        Linkedlist<int_node>::push_ll(&deg_init_head, int_node(0, &init_head));
         degree_head = &deg_init_head;
     }
 
     Node<int>* new_node (int node_id){
-        return Linkedlist<int>::push(&(track[0]->data.node_ref), node_id);
+        return Linkedlist<int>::push_node((*track[0])->data.node_ref, node_id);
     }
 
-    void increase(Node<int>* node, int d){
-        Linkedlist<int>::detachNode(&(track[d]->data.node_ref), node);
+    // void increase(Node<int>* node, int d){
+    //     Linkedlist<int>::detachNode(&((*track[d])->data.node_ref), node);
         
-        if (track.find(d+1)!=track.end()){
-            Linkedlist<int>::push_node(&(track[d+1]->data.node_ref), node);
-        }else{
-            Node<int>* head = NULL;
+    //     if (track.find(d+1)!=track.end()){
+    //         Linkedlist<int>::push_node(&((*track[d+1])->data.node_ref), node);
+    //     }else{
+    //         Node<int>* head = NULL;
             
-            if (track[d]->prev == NULL){ 
-                track[d+1] = Linkedlist<int_node>::push(degree_head, int_node(d+1, head));
-                Linkedlist<int>::push_node(&(track[d+1]->data.node_ref), node); 
-                printf("\nhead");
-            }else{
-                track[d+1] = Linkedlist<int_node>::insertBefore(degree_head, &(*track[d]), int_node(d+1, head));
-                printf("not head");
-                cout<<""<<endl;
-                printf("increase : %d", track[d+1]->data.id);
+    //         if (*track[d] == *degree_head){ 
+    //             Linkedlist<int_node>::push_ll(degree_head, int_node(d+1, head));
+    //             Linkedlist<int>::push_node(&((*track[d+1])->data.node_ref), node); 
+    //             printf("\nhead");
+    //         }else{
+    //             Linkedlist<int_node>::insertBefore(degree_head, *track[d], int_node(d+1, head));
+    //             printf("not head");
+    //             cout<<""<<endl;
+    //             // printf("increase : %d", track[d+1]->data.id);
 
-            }
-        }
+    //         }
+    //     }
 
-        if(track[d]->data.node_ref == NULL){
-            Linkedlist<int_node>::deleteNode(degree_head, track[d]);
-            track.erase(d);
-        }
+    //     if((*track[d])->data.node_ref == NULL){
+    //         Linkedlist<int_node>::deleteNode(degree_head, (*track[d]));
+    //         track.erase(d);
+    //     }
          
-    }
+    // }
 };
 
 void print_map(Node<int_node>* degree_head){
@@ -213,14 +232,18 @@ int main()
 { 
     Degree_tracker deg_tracker = Degree_tracker();
     Node<int>* n1 = deg_tracker.new_node(1);
-    Node<int>* n2 = deg_tracker.new_node(2);
-    Node<int>* n3 = deg_tracker.new_node(4);
+    // Node<int>* n2 = deg_tracker.new_node(2);
+    // Node<int>* n3 = deg_tracker.new_node(4);
 
-    deg_tracker.increase(n2, 0);
-    deg_tracker.increase(n2, 1);
-    deg_tracker.increase(n1, 0);
+    // deg_tracker.increase(n2, 0);
+    // deg_tracker.increase(n2, 1);
+    // deg_tracker.increase(n1, 0);
 
-    Linkedlist<int>::printList(deg_tracker.track[0]->data.node_ref);
-    Linkedlist<int>::printList(deg_tracker.track[1]->data.node_ref);
-    Linkedlist<int>::printList(deg_tracker.track[2]->data.node_ref);
+    // cout<<&n1<<endl;
+    // cout<<*((*track[0])->data.node_ref)<<endl;
+    Linkedlist<int>::printList(n1);
+    // Linkedlist<int>::printList(n1);
+    // Linkedlist<int>::printList((*track[0])->data.node_ref);
+    // Linkedlist<int>::printList(deg_tracker.track[1]->data.node_ref);
+    // Linkedlist<int>::printList(deg_tracker.track[2]->data.node_ref);
 }
