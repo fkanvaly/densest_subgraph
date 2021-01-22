@@ -5,14 +5,6 @@
 
 using namespace std;
 
-template <typename T1, typename T2>
-struct paire { 
-    T1 id; 
-    T2 node_ref;
-    paire(){}
-    paire(T1 id_, T2 node_): id(id_), node_ref(node_){}
-};
-
 // A linked list node 
 template <typename T>
 struct Node { 
@@ -21,8 +13,6 @@ struct Node {
     Node<T>* prev; 
 };
 
-typedef paire<int, Node<int>** > int_node;
-unordered_map<int, Node<int_node>** > track;
 
 
 template <typename T>
@@ -179,13 +169,17 @@ struct Linkedlist{
     } 
 }; 
 
+typedef unordered_map<int, bool> map;
+
 struct Degree_tracker
 {
-    Node<int_node>** degree_head; // pointer to head node pointer. 
+    Node< map* >** degree_head; // pointer to head node pointer. 
+    unordered_map<int, Node< map* >** > track;
+    
     Degree_tracker(){
-        Node<int>* init_head = NULL; 
         Node<int_node>* deg_init_head = NULL;
-        Linkedlist<int_node>::push_ll(&deg_init_head, int_node(0, &init_head));
+        unordered_map<int, bool>* degree_0 = new unordered_map<int, bool>();
+        Linkedlist<int_node>::push_ll(&deg_init_head, degree_0);
         degree_head = &deg_init_head;
     }
 

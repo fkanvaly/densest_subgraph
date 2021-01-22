@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "graph.cpp"
-#include "linkedlist.cpp"
 
 using namespace std;
 
@@ -40,26 +39,7 @@ int main()
     G.add_edge(1,4);
     G.add_edge(4,2);
 
-    G.remove_node(3);
-    G.remove_node(4);
-
-    for (auto &&elt : G.degrees)
-    {
-        cout<<"degree: "<<elt.first<<" size: "<< elt.second.size<<endl;
-
-    }
-    
-
-    Linkedlist<node_t>& L= G.degrees[1];
-    LNode<node_t>* elt = L.get_head();
-    cout<<elt->node->id<<endl;
-    cout<<elt->next->node->id<<endl;
-    cout<<elt->next->next->node->id<<endl;
-    // do
-    // {
-    //     cout<<elt->node->id<<endl;
-    //     elt = elt->next;
-    // } while(elt!=nullptr);
+    G.print_nodes();
     
 
 
