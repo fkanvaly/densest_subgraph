@@ -6,6 +6,7 @@
 #include <vector> 
 
 using namespace std;
+typedef unordered_map<int, unordered_map<int, bool> > edge_list;
 
 Graph read_graph(string filename){
     Graph G = Graph();
@@ -28,30 +29,31 @@ Graph read_graph(string filename){
     return G;
 }
 
-unordered_map<int, bool> densest_graph(Graph G){
+edge_list_t densest_graph(Graph G){
 
     // init H
-    unordered_map<int, bool> H;
+    edge_list_t H = G.edges;
     float H_density = G.average_degree_density();
-    for (auto &&node : G.nodes)
-        H[node.first] = true;
 
-    vector<int> node_to_delete_in_H;
+    vector<Edge> edge_to_delete_in_H;
     // while (G contains at least one edge)
     int i_max = G.nodes.size();
     int i=0;
     while (G.n_edges>0 && i<i_max+1)
     {
-        G.print_lowest_degree();
+        // G.print_lowest_degree();
         int node_id = G.lowest_node();
-        cout << "node_to_remove: "<<node_id<< endl;
-        G.remove_node(node_id);
+        // cout << "node_to_remove: "<<node_id<< endl;
+        vector<Edge> to_remove = G.remove_node(node_id);
 
-        node_to_delete_in_H.push_back(node_id);
+        edge_to_delete_in_H.insert( edge_to_delete_in_H.end(), to_remove.begin(), to_remove.end() );
+        // node_to_delete_in_H.push_back(node_id);
         if(G.average_degree_density() > H_density){
-            for (auto &&id : node_to_delete_in_H)
-                H.erase(id);
-            node_to_delete_in_H.clear();            
+            for (auto &&e : edge_to_delete_in_H){
+                H[e.src].erase(e.dst);
+                H[e.dst].erase(e.src);
+            }
+            edge_to_delete_in_H.clear();            
         }
         i++;
     }
@@ -63,10 +65,14 @@ unordered_map<int, bool> densest_graph(Graph G){
 int main()
 {
     Graph G = read_graph("../data/facebook_combined.txt");
-    // Graph G = read_graph("../data/com-dblp.ungraph.txt");
+    // Graph G = read_graph("com-dblp.ungraph.txt");
     
     cout<<"nb of edge: "<<G.n_edges<<endl;
     cout<<"nb of nodes: "<<G.nodes.size()<<endl;
+
+    time_t start, end;
+    time(&start);
+    ios_base::sync_with_stdio(false);
 
     // EXAMPLE
     // Graph G = Graph();
@@ -89,13 +95,35 @@ int main()
     // G.add_edge(1, 6);
     // G.add_edge(5, 3);
 
-    unordered_map<int, bool> H = densest_graph(G);
+    edge_list_t H = densest_graph(G);
+
+    time(&end); 
+    // Calculating total time taken by the program. 
+    double time_taken = double(end - start); 
+    cout << "Time taken by program is : " << fixed 
+         << time_taken << setprecision(5); 
+    cout << " sec " << endl; 
+
+    vector<Edge> edge_list;
+    for (auto &&src : H)
+    {
+        for (auto &&elt : src.second)
+        {
+            edge_list.push_back(elt.second);
+            if (H[elt.first].find(src.first) != H[elt.first].end()){
+                H[elt.first].erase(src.first);
+            }
+        }
+        
+    }
+
+    
 
     ofstream myfile;
     myfile.open ("densest.txt");
-    for (auto &&node : H){
-        cout<<node.first<<endl;
-        myfile << node.first << "\n";
+    for (auto &&edge : edge_list){
+        cout << edge.src << " " << edge.dst <<endl;
+        myfile << edge.src << " " << edge.dst <<"\n";
     }
     myfile.close();
 

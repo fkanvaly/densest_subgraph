@@ -11,21 +11,10 @@ struct Node
     /* data */
     int id;
     int degree=0;
-    unordered_map<int, bool > neighboors;
-
     
     Node():id(-1){}
-
     Node(int id_)
         :id(id_){};
-
-    void add_edge(int dst_id, Node* dst_node){
-        neighboors[dst_id] = true;
-    }
-
-    bool has_edge(int dst_id){
-        return neighboors.find(dst_id)!=neighboors.end();
-    }
     ~Node(){} 
 };
 
@@ -33,7 +22,11 @@ struct Edge
 {
     int src;
     int dst;
+    Edge(){};
+    Edge(int _src, int _dst)
+        :src(_src), dst(_dst){}
 };
+typedef unordered_map<int, unordered_map<int, Edge> > edge_list_t;
 
 
 struct Graph
@@ -41,7 +34,7 @@ struct Graph
     /* data */
     public:
         unordered_map<int, Node*> nodes; 
-        unordered_map<int, unordered_map<int, bool> > edges; 
+        edge_list_t edges; 
         map<int, unordered_map<int, bool> > track;
         int n_edges=0;
         int lowest_degree=0;
@@ -96,7 +89,7 @@ struct Graph
     }
 
     float average_degree_density(){
-        return n_edges/nodes.size();
+        return n_edges/float(nodes.size());
     }
 
     void add_edge(int src, int dst){
@@ -116,23 +109,21 @@ struct Graph
         }
 
         // if edge already exist
-        if(nodes[src]->has_edge(dst))
+        if(edges[src].find(dst)!=edges[src].end())
             return;
 
-        // update nodelist
-        Node* src_node = nodes[src];
-        Node* dst_node = nodes[dst];
-
-        change_degree(src, src_node->degree+1);
-        change_degree(dst, dst_node->degree+1);
-
         // add connection in two directions
-        src_node->add_edge(dst, dst_node);
-        dst_node->add_edge(src, src_node);
+        edges[src][dst]=Edge(src, dst);
+        edges[dst][src]=Edge(dst, src);
 
-        // change degree node
+        // update nodelist
+        change_degree(src, nodes[src]->degree+1);
+        change_degree(dst, nodes[dst]->degree+1);
+
+        // change edge count
         n_edges++;
 
+        // cout<<"nb of edge: "<<n_edges << " nb of nodes: "<<nodes.size()<<endl;
     }
 
     void change_degree(int id, int deg){
@@ -155,21 +146,20 @@ struct Graph
 
     }
 
-    void remove_node(int id, ){
+    vector<Edge> remove_node(int id){
+        vector<Edge> removed_edge;
         Node* node = nodes[id];
 
         // remove the node from its neighboors neighborhood
-        for(auto& elt: node->neighboors){
-            // remove the node in it's neigborhood
-            int n_id = elt.first;
-            Node* n_node = nodes[n_id];
-            n_node->neighboors.erase(id);
-
-            // move the neigboor to new degree
-            int n_deg = n_node->degree;
-            change_degree(n_id, n_deg-1) ;
+        for(auto&& elt: edges[id]){
+            int neighb_id = elt.first;
+            edges[neighb_id].erase(id); // remove the node in it's neigborhood
+            int n_deg = nodes[neighb_id]->degree;
+            change_degree(neighb_id, nodes[neighb_id]->degree - 1) ;
             n_edges--;
-            // cout << "neigh: "<< n_id << " from: " << n_deg << " to: " << n_node->degree<<endl;
+
+            removed_edge.push_back(Edge(id, neighb_id));
+            // cout << "neigh: "<< neighb_id << " from: " << n_deg << " to: " << nodes[neighb_id]->degree<<endl;
         }
 
         // remove from degree tracker
@@ -185,6 +175,7 @@ struct Graph
         
         // remove from nodes
         nodes.erase(id);
+        return removed_edge;
     }
 };
 
