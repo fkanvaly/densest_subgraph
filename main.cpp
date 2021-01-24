@@ -53,9 +53,10 @@ output_t densest_graph(Graph G){
     int i=0;
     while (G.n_edges>0)
     {
-        // G.print_lowest_degree();
+        G.print_degree();
+        // G.print_track();
         int node_id = G.lowest_node();
-        // cout<<"node to remove: "<< node_id <<endl;
+        cout<<"----> node to remove: "<< node_id <<endl;
         vector<Edge> to_remove = G.remove_node(node_id);
 
         edge_to_delete_in_H.insert( edge_to_delete_in_H.end(), to_remove.begin(), to_remove.end() );
@@ -83,21 +84,45 @@ output_t densest_graph(Graph G){
 int main()
 {   
     // parameter
-    bool write_edge = false;
-    int runs = 10;
+    bool write_edge = true;
+    int runs = 1;
     int idx = 4;
 
-    vector<string> dataset = {"email-Eu-core", "cit-HepPh", "email-EuAll", "com-DBLP", "com-Youtube"};
+    // vector<string> dataset = {"email-Eu-core", "cit-HepPh", "email-EuAll", "com-DBLP", "com-Youtube"};
     string root = "../output/";
-    string filename = dataset[idx];
-    Graph G = read_graph(root + filename +".txt");
+    // string filename = dataset[idx];
+    // Graph G = read_graph(root + filename +".txt");
+    
+
+
+    Graph G = Graph();
+    string filename="example";
+    G.add_edge(8, 4);
+    G.add_edge(9, 4);
+    G.add_edge(10, 4);
+    G.add_edge(4, 7);
+    G.add_edge(4, 2);
+    G.add_edge(7, 5);
+    G.add_edge(5, 1);
+    G.add_edge(1, 3);
+    G.add_edge(3, 6);
+
+    G.add_edge(6, 2);
+    G.add_edge(2, 5);
+
+    G.add_edge(2, 3);
+    G.add_edge(2, 1);
+    G.add_edge(5, 6);
+    G.add_edge(1, 6);
+    G.add_edge(5, 3);
+
 
     cout<<"nb of edge: "<<G.n_edges<<endl;
-    cout<<"nb of nodes: "<<G.nodes.size()<<endl;
+    cout<<"nb of nodes: "<<G.nodes.size()<<endl <<endl;
 
     // create metadata file
     ofstream metadata;
-    metadata.open (root+"densest_subgraph/"+filename+"-meta.csv");
+    metadata.open(root+"densest_subgraph/"+filename+"-meta.csv");
     metadata << "dataset,start_nodes,start_edges,times,nodes,edges,density\n";
 
     for(int i=0; i<runs; i++){
