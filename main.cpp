@@ -82,55 +82,65 @@ output_t densest_graph(Graph G){
 
 int main()
 {   
-    string dataset[] = {"email-Eu-core", "cit-HepPh", "email-EuAll", "com-DBLP", "com-Youtube"};
+    // parameter
+    bool write_edge = false;
+    int runs = 10;
+    int idx = 4;
+
+    vector<string> dataset = {"email-Eu-core", "cit-HepPh", "email-EuAll", "com-DBLP", "com-Youtube"};
     string root = "../output/";
-    string filename = dataset[4];
+    string filename = dataset[idx];
     Graph G = read_graph(root + filename +".txt");
 
-    
     cout<<"nb of edge: "<<G.n_edges<<endl;
     cout<<"nb of nodes: "<<G.nodes.size()<<endl;
 
     // create metadata file
     ofstream metadata;
     metadata.open (root+"densest_subgraph/"+filename+"-meta.csv");
-    metadata << "times,nodes,edges,density\n";
+    metadata << "dataset,start_nodes,start_edges,times,nodes,edges,density\n";
 
-    // mesure execution time
-    time_t start, end;
-    time(&start);
-    ios_base::sync_with_stdio(false);
-    output_t out = densest_graph(G);
-    time(&end); 
+    for(int i=0; i<runs; i++){
+        Graph G_ = G.copy();
+        // mesure execution time
+        clock_t start, end;
+        start = clock();
+        output_t out = densest_graph(G_);
+        end = clock(); 
 
-    // Calculating total time taken by the program. 
-    double time_taken = double(end - start); 
-    cout << "Time taken by program is : " << fixed 
-         << time_taken << setprecision(5); 
-    cout << " sec " << endl; 
+        // Calculating total time taken by the program. 
+        double time_taken = double(end - start)/ double(CLOCKS_PER_SEC); 
+        cout << "Time taken by program is : " << fixed 
+            << time_taken << setprecision(5); 
+        cout << " sec " << endl; 
 
-    // write meta data
-    metadata << time_taken << setprecision(5) << "," << out.nodes << "," << out.edges << "," << out.density << "\n";
-
-    // write the resulting graph
-    vector<Edge> edge_list;
-    for (auto &&src : out.H)
-    {
-        for (auto &&elt : src.second)
-        {
-            edge_list.push_back(elt.second);
-            if (out.H[elt.first].find(src.first) != out.H[elt.first].end()){
-                out.H[elt.first].erase(src.first);
+        // write meta data
+        metadata <<filename<<","<< G.nodes.size()<< "," << G.n_edges << "," <<time_taken << setprecision(5) << "," 
+                 << out.nodes << "," << out.edges << "," << out.density << "\n";
+        
+        //write graph ones
+        if (i==0 && write_edge){
+            // write the resulting graph
+            vector<Edge> edge_list;
+            for (auto &&src : out.H)
+            {
+                for (auto &&elt : src.second)
+                {
+                    edge_list.push_back(elt.second);
+                    if (out.H[elt.first].find(src.first) != out.H[elt.first].end()){
+                        out.H[elt.first].erase(src.first);
+                    }
+                }
             }
+
+            ofstream graph;
+            graph.open (root+"densest_subgraph/"+filename+"-graph.txt");
+            for (auto &&edge : edge_list){
+                graph << edge.src << " " << edge.dst <<"\n";
+            }
+            graph.close();
         }
     }
-
-    ofstream graph;
-    graph.open (root+"densest_subgraph/"+filename+"-graph.txt");
-    for (auto &&edge : edge_list){
-        graph << edge.src << " " << edge.dst <<"\n";
-    }
-    graph.close();
 
     metadata.close();
 
