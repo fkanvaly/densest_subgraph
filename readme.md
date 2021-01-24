@@ -34,8 +34,8 @@ then create a output folder `../output/` that contains a subfolder `densest_subg
 └── densest_subgraph/
 ```
 
-> - use `python3 convert.py` to convert all dataset into a write format for the c++ code and put them in `../output/`.
-> - in `main.cpp` use `idx` to choose a dataset and `runs` to choose the number of runs to do. `write_edge` to choose if whether or we cant to output the densest graph edges.
+- use `python3 convert.py` to convert all dataset into a write format for the c++ code and put them in `../output/`.
+- in `main.cpp` use `idx` to choose a dataset and `runs` to choose the number of runs to do. `write_edge` to choose if whether or we cant to output the densest graph edges.
 ```c++
 // parameter
 bool write_edge = true;
@@ -50,7 +50,7 @@ string root = "../output/";
 string filename = dataset[idx];
 Graph G = read_graph(root + filename +".txt");
 ```
-> - then compile the c++ code and runs. this will generate data a `$dataset_name.csv` file which give the densest graph density, number of nodes and edges. 
+- then compile the c++ code and runs. this will generate data a `$dataset_name.csv` file which give the densest graph density, number of nodes and edges. 
 ```
 g++ -std=c++11 main.cpp -w
 ./a.out
