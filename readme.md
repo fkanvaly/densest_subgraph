@@ -1,6 +1,6 @@
 <img src="https://miro.medium.com/max/2978/1*rmq7bd3GFjcwfXtkrBQaPQ.png" align="right" width="150"/>
 
-# Protein Classification
+# Finding densest subgraphs in linear time
 Author: Kanvaly Fadiga
 
 This repo implement a 2-approximation algorithm for the densest subgraph problem
