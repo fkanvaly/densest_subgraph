@@ -4,6 +4,7 @@
 #include <unordered_map> 
 #include <map> 
 
+
 using namespace std;
 
 struct Node
@@ -14,7 +15,9 @@ struct Node
     
     Node():id(-1){}
     Node(int id_)
-        :id(id_){};
+        :id(id_){}
+    Node(int id_, int deg)
+        :id(id_), degree(deg){}
     ~Node(){} 
 };
 
@@ -23,6 +26,8 @@ struct Edge
     int src;
     int dst;
     Edge(){};
+    Edge(Edge const& e)
+        :src(e.src), dst(e.dst){}
     Edge(int _src, int _dst)
         :src(_src), dst(_dst){}
 };
@@ -43,7 +48,21 @@ struct Graph
     }
 
     Graph copy(){
-        Graph g = Graph();
+        Graph G = Graph();
+        for (auto &&elt : nodes)
+            G.nodes[elt.first] = new Node(elt.second->id, elt.second->degree);
+        
+        for (auto &&id : edges)
+            for (auto &&ed : id.second)
+                G.edges[id.first][ed.first] = Edge(ed.second);
+
+        for (auto &&id : track)
+            for (auto &&ed : id.second)
+                G.track[id.first][ed.first] = ed.second;
+
+        G.n_edges = n_edges;
+        G.lowest_degree = lowest_degree;
+        return G;
     }
 
     int nb_nodes(){
@@ -93,6 +112,9 @@ struct Graph
     }
 
     void add_edge(int src, int dst){
+        if(src==dst){
+            return;
+        }
         // cout<<"src: "<<src<<" dst: "<<dst<<endl;
         if(nodes.size()==0){
             lowest_degree = 1;
@@ -154,6 +176,7 @@ struct Graph
         for(auto&& elt: edges[id]){
             int neighb_id = elt.first;
             edges[neighb_id].erase(id); // remove the node in it's neigborhood
+
             int n_deg = nodes[neighb_id]->degree;
             change_degree(neighb_id, nodes[neighb_id]->degree - 1) ;
             n_edges--;
