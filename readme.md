@@ -16,6 +16,8 @@ This repo implement a 2-approximation algorithm for the densest subgraph problem
 
 # Usage
 
+download the dataset from : [link](http://snap.stanford.edu/data/index.html)
+
 create a new folder `input/` and paste the data by renaming them as follow:
 
 ```
