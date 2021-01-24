@@ -90,7 +90,7 @@ int main()
     int idx = 0;
 
     vector<string> dataset = {"email-Eu-core", "cit-HepPh", "email-EuAll", "com-DBLP", "com-Youtube"};
-    string root = "../output/";
+    string root = "output/";
     string filename = dataset[idx];
     Graph G = read_graph(root + filename +".txt");
     
