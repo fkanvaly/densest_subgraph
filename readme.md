@@ -16,10 +16,10 @@ This repo implement a 2-approximation algorithm for the densest subgraph problem
 
 # Usage
 
-create a new folder `../input/` and paste the data by renaming them as follow:
+create a new folder `input/` and paste the data by renaming them as follow:
 
 ```
-../input
+input
 └── email-Eu-core.txt
 └── com-DBLP.txt 
 └── com-Youtube.txt
@@ -27,14 +27,14 @@ create a new folder `../input/` and paste the data by renaming them as follow:
 └── cit-HepPh.txt
 ```
 
-then create a output folder `../output/` that contains a subfolder `densest_subgraph/`: 
+then create a output folder `output/` that contains a subfolder `densest_subgraph/`: 
 
 ```
-../output
+output
 └── densest_subgraph/
 ```
 
-- use `python3 convert.py` to convert all dataset into a write format for the c++ code and put them in `../output/`.
+- use `python3 convert.py` to convert all dataset into a write format for the c++ code and put them in `output/`.
 - in `main.cpp` use `idx` to choose a dataset and `runs` to choose the number of runs to do. `write_edge` to choose if whether or we cant to output the densest graph edges.
 ```c++
 // parameter
@@ -46,7 +46,7 @@ vector<string> dataset = {"email-Eu-core", "cit-HepPh",
                           "email-EuAll", "com-DBLP", 
                           "com-Youtube"};
 
-string root = "../output/";
+string root = "output/";
 string filename = dataset[idx];
 Graph G = read_graph(root + filename +".txt");
 ```
