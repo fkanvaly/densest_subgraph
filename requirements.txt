@@ -1,0 +1,4 @@
+iqplot==0.2.0
+pandas
+bokeh==2.2.3
+numpy
