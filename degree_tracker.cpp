@@ -2,6 +2,7 @@
 // a Cicular Doubly Linked list in begging, end
 // and middle
 #include <iostream>
+#include <stdexcept>
 using namespace std;
 
 // Structure of a node_t
@@ -112,6 +113,11 @@ void deletenode(node_t** start, node_t* curr)
         return; 
 
 	assert(curr != NULL);
+	if (curr == NULL)
+	{
+		throw std::invalid_argument( "error CURR is nuLL" );
+	}
+	
     // Find the required node 
     // Declare two pointers and initialize them 
     node_t *prev_1 = curr->prev; 

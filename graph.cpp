@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map> 
 #include <map> 
+#include <cassert>
 #include "degree_tracker.cpp" 
 
 
